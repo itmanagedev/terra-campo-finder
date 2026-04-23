@@ -63,20 +63,22 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  /* Brand: Terra & Campo */
+  --background: oklch(0.972 0.012 85);
+  --foreground: oklch(0.２ 0.03 50);
+  --foreground: oklch(0.20 0.03 50);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.20 0.03 50);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.20 0.03 50);
+  --primary: oklch(0.38 0.08 135);
+  --primary-foreground: oklch(0.98 0.01 85);
+  --secondary: oklch(0.93 0.02 85);
+  --secondary-foreground: oklch(0.20 0.03 50);
+  --muted: oklch(0.93 0.02 85);
+  --muted-foreground: oklch(0.45 0.03 60);
+  --accent: oklch(0.68 0.14 75);
+  --accent-foreground: oklch(0.15 0.02 50);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
   --border: oklch(0.929 0.013 255.508);
