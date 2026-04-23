@@ -14,3 +14,5 @@ npm-debug.log*
 .env.local
 .env.*.local
 README.md
+Dockerfile
+.dockerignore

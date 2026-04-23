@@ -8,11 +8,14 @@ WORKDIR /app
 
 RUN apk add --no-cache libc6-compat python3 make g++
 
-COPY package.json package-lock.json* bun.lockb* ./
+COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
+
+# Prune dev dependencies for the runtime image
+RUN npm prune --omit=dev --legacy-peer-deps
 
 # ============================================
 # Stage 2: Runtime
@@ -27,7 +30,8 @@ ENV HOST=0.0.0.0
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server.mjs ./server.mjs
 
 EXPOSE 3000
 
-CMD ["node", "dist/server/index.js"]
+CMD ["node", "server.mjs"]
