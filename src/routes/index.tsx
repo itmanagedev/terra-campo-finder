@@ -231,7 +231,7 @@ function Hero() {
 }
 
 function PropertyCard({ p }: { p: (typeof properties)[number] }) {
-  const waLink = `https://wa.me/5585999999999?text=${encodeURIComponent(
+  const waLink = `https://wa.me/558588429467?text=${encodeURIComponent(
     `Olá, tenho interesse na propriedade ${p.title}`,
   )}`;
   return (
@@ -387,7 +387,7 @@ function Footer() {
 
 function FloatingWhatsApp() {
   const href =
-    "https://wa.me/5585988429467?text=" +
+    "https://wa.me/558588429467?text=" +
     encodeURIComponent("Olá, tenho interesse em uma propriedade");
   return (
     <a
