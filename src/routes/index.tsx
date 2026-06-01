@@ -295,11 +295,17 @@ function PropertiesSection() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {sorted.map((p) => (
-          <PropertyCard key={p.id} p={p} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-muted-foreground">Carregando propriedades...</p>
+      ) : sorted.length === 0 ? (
+        <p className="text-muted-foreground">Nenhuma propriedade disponível no momento.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {sorted.map((p) => (
+            <PropertyCard key={p.id} p={p} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -320,6 +326,9 @@ function Footer() {
         <p className="text-sm opacity-80">
           © 2024 Terra & Campo Imóveis Rurais. Todos os direitos reservados.
         </p>
+        <Link to="/admin" className="text-xs opacity-60 hover:opacity-100">
+          Admin
+        </Link>
       </div>
     </footer>
   );
