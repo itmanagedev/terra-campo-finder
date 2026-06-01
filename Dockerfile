@@ -12,7 +12,8 @@ COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
-RUN npm run build
+# Build com config Node.js (sem Cloudflare) para rodar no EasyPanel
+RUN npx vite build --config vite.config.node.ts
 
 # Prune dev dependencies for the runtime image
 RUN npm prune --omit=dev --legacy-peer-deps
