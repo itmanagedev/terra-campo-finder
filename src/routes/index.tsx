@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,92 +31,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const properties = [
-  {
-    id: 1,
-    title: "Fazenda Boa Vista",
-    type: "Fazenda",
-    city: "Goiânia",
-    state: "GO",
-    area: 320,
-    price: 2800000,
-    date: "2024-03-10",
-    description:
-      "Fazenda com pastagem formada, açude, casa sede e energia elétrica.",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600",
-  },
-  {
-    id: 2,
-    title: "Sítio Recanto Verde",
-    type: "Sítio",
-    city: "Campinas",
-    state: "SP",
-    area: 18,
-    price: 480000,
-    date: "2024-04-02",
-    description:
-      "Sítio com pomar, casa de alvenaria, poço artesiano e nascente.",
-    image:
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600",
-  },
-  {
-    id: 3,
-    title: "Chácara Sol Nascente",
-    type: "Chácara",
-    city: "Cuiabá",
-    state: "MT",
-    area: 5,
-    price: 195000,
-    date: "2024-04-15",
-    description:
-      "Chácara com infraestrutura completa, cercada e com acesso asfaltado.",
-    image:
-      "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=600",
-  },
-  {
-    id: 4,
-    title: "Fazenda Horizonte",
-    type: "Fazenda",
-    city: "Palmas",
-    state: "TO",
-    area: 540,
-    price: 4200000,
-    date: "2024-02-20",
-    description:
-      "Fazenda com 540 ha, certificada, ótima localização e topografia plana.",
-    image:
-      "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=600",
-  },
-  {
-    id: 5,
-    title: "Sítio Água Viva",
-    type: "Sítio",
-    city: "Uberlândia",
-    state: "MG",
-    area: 25,
-    price: 620000,
-    date: "2024-03-28",
-    description:
-      "Sítio com rio perene, benfeitorias, curral e galpão de máquinas.",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600",
-  },
-  {
-    id: 6,
-    title: "Chácara Bela Vista",
-    type: "Chácara",
-    city: "Anápolis",
-    state: "GO",
-    area: 8,
-    price: 310000,
-    date: "2024-04-18",
-    description:
-      "Chácara com lago artificial, churrasqueira, piscina e pomar variado.",
-    image:
-      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=600",
-  },
-];
+type Property = {
+  id: string;
+  title: string;
+  type: string;
+  city: string;
+  state: string;
+  area: number;
+  price: number;
+  description: string;
+  image: string;
+  created_at: string;
+};
 
 const SORT_OPTIONS = [
   { key: "recent", label: "Mais Recentes" },
@@ -230,7 +157,7 @@ function Hero() {
   );
 }
 
-function PropertyCard({ p }: { p: (typeof properties)[number] }) {
+function PropertyCard({ p }: { p: Property }) {
   const waLink = `https://wa.me/558588429467?text=${encodeURIComponent(
     `Olá, tenho interesse na propriedade ${p.title}`,
   )}`;
@@ -303,6 +230,19 @@ function PropertyCard({ p }: { p: (typeof properties)[number] }) {
 
 function PropertiesSection() {
   const [sort, setSort] = useState<SortKey>("recent");
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("properties")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setProperties(data as Property[]);
+        setLoading(false);
+      });
+  }, []);
 
   const sorted = useMemo(() => {
     const copy = [...properties];
@@ -310,7 +250,7 @@ function PropertiesSection() {
       case "recent":
       case "date":
         return copy.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         );
       case "low":
         return copy.sort((a, b) => a.price - b.price);
@@ -319,7 +259,7 @@ function PropertiesSection() {
       default:
         return copy;
     }
-  }, [sort]);
+  }, [sort, properties]);
 
   return (
     <section id="properties" className="mx-auto max-w-6xl px-4 py-20">
@@ -355,11 +295,17 @@ function PropertiesSection() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {sorted.map((p) => (
-          <PropertyCard key={p.id} p={p} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-muted-foreground">Carregando propriedades...</p>
+      ) : sorted.length === 0 ? (
+        <p className="text-muted-foreground">Nenhuma propriedade disponível no momento.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {sorted.map((p) => (
+            <PropertyCard key={p.id} p={p} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -380,6 +326,9 @@ function Footer() {
         <p className="text-sm opacity-80">
           © 2024 Terra & Campo Imóveis Rurais. Todos os direitos reservados.
         </p>
+        <Link to="/admin" className="text-xs opacity-60 hover:opacity-100">
+          Admin
+        </Link>
       </div>
     </footer>
   );
