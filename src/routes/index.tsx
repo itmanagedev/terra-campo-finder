@@ -230,6 +230,19 @@ function PropertyCard({ p }: { p: Property }) {
 
 function PropertiesSection() {
   const [sort, setSort] = useState<SortKey>("recent");
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("properties")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setProperties(data as Property[]);
+        setLoading(false);
+      });
+  }, []);
 
   const sorted = useMemo(() => {
     const copy = [...properties];
@@ -237,7 +250,7 @@ function PropertiesSection() {
       case "recent":
       case "date":
         return copy.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         );
       case "low":
         return copy.sort((a, b) => a.price - b.price);
@@ -246,7 +259,7 @@ function PropertiesSection() {
       default:
         return copy;
     }
-  }, [sort]);
+  }, [sort, properties]);
 
   return (
     <section id="properties" className="mx-auto max-w-6xl px-4 py-20">
