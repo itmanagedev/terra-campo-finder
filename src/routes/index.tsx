@@ -157,7 +157,7 @@ function Hero() {
   );
 }
 
-function PropertyCard({ p }: { p: (typeof properties)[number] }) {
+function PropertyCard({ p }: { p: Property }) {
   const waLink = `https://wa.me/558588429467?text=${encodeURIComponent(
     `Olá, tenho interesse na propriedade ${p.title}`,
   )}`;
