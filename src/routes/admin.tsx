@@ -35,6 +35,7 @@ const emptyForm = {
 
 function AdminPage() {
   const navigate = useNavigate();
+  const callCreateUser = useServerFn(createAdminUser);
   const [checking, setChecking] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
@@ -43,6 +44,13 @@ function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+
+  // New-user form
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserMakeAdmin, setNewUserMakeAdmin] = useState(true);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [userMsg, setUserMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const loadProperties = useCallback(async () => {
     const { data, error } = await supabase
