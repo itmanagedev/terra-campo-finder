@@ -293,6 +293,68 @@ function AdminPage() {
           </form>
         </section>
 
+        <section className="bg-card rounded-2xl shadow-sm ring-1 ring-black/5 p-6">
+          <h2 className="text-xl font-bold text-foreground mb-1">Criar novo usuário</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Apenas administradores autenticados podem cadastrar novos usuários.
+          </p>
+          <form
+            onSubmit={handleCreateUser}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-foreground">Email</label>
+              <input
+                type="email"
+                required
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground">Senha</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <label className="md:col-span-2 inline-flex items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={newUserMakeAdmin}
+                onChange={(e) => setNewUserMakeAdmin(e.target.checked)}
+                className="h-4 w-4"
+              />
+              Conceder permissão de administrador
+            </label>
+            {userMsg && (
+              <p
+                className={`md:col-span-2 text-sm rounded p-2 ${
+                  userMsg.type === "ok"
+                    ? "text-primary bg-primary/10"
+                    : "text-destructive bg-destructive/10"
+                }`}
+              >
+                {userMsg.text}
+              </p>
+            )}
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                disabled={creatingUser}
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {creatingUser ? "Criando..." : "Criar usuário"}
+              </button>
+            </div>
+          </form>
+        </section>
+
         <section>
           <h2 className="text-xl font-bold text-foreground mb-4">
             Propriedades cadastradas ({properties.length})
