@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,92 +31,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const properties = [
-  {
-    id: 1,
-    title: "Fazenda Boa Vista",
-    type: "Fazenda",
-    city: "Goiânia",
-    state: "GO",
-    area: 320,
-    price: 2800000,
-    date: "2024-03-10",
-    description:
-      "Fazenda com pastagem formada, açude, casa sede e energia elétrica.",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600",
-  },
-  {
-    id: 2,
-    title: "Sítio Recanto Verde",
-    type: "Sítio",
-    city: "Campinas",
-    state: "SP",
-    area: 18,
-    price: 480000,
-    date: "2024-04-02",
-    description:
-      "Sítio com pomar, casa de alvenaria, poço artesiano e nascente.",
-    image:
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600",
-  },
-  {
-    id: 3,
-    title: "Chácara Sol Nascente",
-    type: "Chácara",
-    city: "Cuiabá",
-    state: "MT",
-    area: 5,
-    price: 195000,
-    date: "2024-04-15",
-    description:
-      "Chácara com infraestrutura completa, cercada e com acesso asfaltado.",
-    image:
-      "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=600",
-  },
-  {
-    id: 4,
-    title: "Fazenda Horizonte",
-    type: "Fazenda",
-    city: "Palmas",
-    state: "TO",
-    area: 540,
-    price: 4200000,
-    date: "2024-02-20",
-    description:
-      "Fazenda com 540 ha, certificada, ótima localização e topografia plana.",
-    image:
-      "https://images.unsplash.com/photo-1500076656116-558758c991c1?w=600",
-  },
-  {
-    id: 5,
-    title: "Sítio Água Viva",
-    type: "Sítio",
-    city: "Uberlândia",
-    state: "MG",
-    area: 25,
-    price: 620000,
-    date: "2024-03-28",
-    description:
-      "Sítio com rio perene, benfeitorias, curral e galpão de máquinas.",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600",
-  },
-  {
-    id: 6,
-    title: "Chácara Bela Vista",
-    type: "Chácara",
-    city: "Anápolis",
-    state: "GO",
-    area: 8,
-    price: 310000,
-    date: "2024-04-18",
-    description:
-      "Chácara com lago artificial, churrasqueira, piscina e pomar variado.",
-    image:
-      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=600",
-  },
-];
+type Property = {
+  id: string;
+  title: string;
+  type: string;
+  city: string;
+  state: string;
+  area: number;
+  price: number;
+  description: string;
+  image: string;
+  created_at: string;
+};
 
 const SORT_OPTIONS = [
   { key: "recent", label: "Mais Recentes" },
