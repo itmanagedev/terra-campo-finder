@@ -142,6 +142,33 @@ function AdminPage() {
     loadProperties();
   };
 
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingUser(true);
+    setUserMsg(null);
+    try {
+      await callCreateUser({
+        data: {
+          email: newUserEmail.trim(),
+          password: newUserPassword,
+          makeAdmin: newUserMakeAdmin,
+        },
+      });
+      setUserMsg({ type: "ok", text: `Usuário ${newUserEmail} criado com sucesso.` });
+      setNewUserEmail("");
+      setNewUserPassword("");
+      setNewUserMakeAdmin(true);
+    } catch (err: unknown) {
+      setUserMsg({
+        type: "err",
+        text: err instanceof Error ? err.message : "Erro ao criar usuário",
+      });
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+
   if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
