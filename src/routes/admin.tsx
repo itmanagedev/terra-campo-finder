@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { createAdminUser } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — Terra & Campo" }] }),
@@ -33,6 +35,7 @@ const emptyForm = {
 
 function AdminPage() {
   const navigate = useNavigate();
+  const callCreateUser = useServerFn(createAdminUser);
   const [checking, setChecking] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
@@ -41,6 +44,13 @@ function AdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+
+  // New-user form
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserMakeAdmin, setNewUserMakeAdmin] = useState(true);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [userMsg, setUserMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
   const loadProperties = useCallback(async () => {
     const { data, error } = await supabase
@@ -131,6 +141,33 @@ function AdminPage() {
     }
     loadProperties();
   };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingUser(true);
+    setUserMsg(null);
+    try {
+      await callCreateUser({
+        data: {
+          email: newUserEmail.trim(),
+          password: newUserPassword,
+          makeAdmin: newUserMakeAdmin,
+        },
+      });
+      setUserMsg({ type: "ok", text: `Usuário ${newUserEmail} criado com sucesso.` });
+      setNewUserEmail("");
+      setNewUserPassword("");
+      setNewUserMakeAdmin(true);
+    } catch (err: unknown) {
+      setUserMsg({
+        type: "err",
+        text: err instanceof Error ? err.message : "Erro ao criar usuário",
+      });
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
 
   if (checking) {
     return (
@@ -252,6 +289,68 @@ function AdminPage() {
                   Cancelar
                 </button>
               )}
+            </div>
+          </form>
+        </section>
+
+        <section className="bg-card rounded-2xl shadow-sm ring-1 ring-black/5 p-6">
+          <h2 className="text-xl font-bold text-foreground mb-1">Criar novo usuário</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Apenas administradores autenticados podem cadastrar novos usuários.
+          </p>
+          <form
+            onSubmit={handleCreateUser}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-foreground">Email</label>
+              <input
+                type="email"
+                required
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground">Senha</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <label className="md:col-span-2 inline-flex items-center gap-2 text-sm text-foreground">
+              <input
+                type="checkbox"
+                checked={newUserMakeAdmin}
+                onChange={(e) => setNewUserMakeAdmin(e.target.checked)}
+                className="h-4 w-4"
+              />
+              Conceder permissão de administrador
+            </label>
+            {userMsg && (
+              <p
+                className={`md:col-span-2 text-sm rounded p-2 ${
+                  userMsg.type === "ok"
+                    ? "text-primary bg-primary/10"
+                    : "text-destructive bg-destructive/10"
+                }`}
+              >
+                {userMsg.text}
+              </p>
+            )}
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                disabled={creatingUser}
+                className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {creatingUser ? "Criando..." : "Criar usuário"}
+              </button>
             </div>
           </form>
         </section>

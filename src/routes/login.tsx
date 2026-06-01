@@ -9,7 +9,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,25 +25,12 @@ function LoginPage() {
     setLoading(true);
     setMsg(null);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
-        });
-        if (error) throw error;
-        setMsg(
-          "Conta criada! Faça login. Para acessar o painel, peça ao administrador para conceder permissão.",
-        );
-        setMode("login");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        navigate({ to: "/admin" });
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      navigate({ to: "/admin" });
     } catch (err: unknown) {
       setMsg(err instanceof Error ? err.message : "Erro inesperado");
     } finally {
@@ -59,12 +45,10 @@ function LoginPage() {
           ← Voltar para o site
         </Link>
         <h1 className="mt-4 text-2xl font-bold text-foreground">
-          {mode === "login" ? "Painel Administrativo" : "Criar Conta"}
+          Painel Administrativo
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "login"
-            ? "Entre com seu usuário e senha"
-            : "Cadastre-se para acessar o painel"}
+          Entre com seu usuário e senha
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -99,25 +83,13 @@ function LoginPage() {
             disabled={loading}
             className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60 transition"
           >
-            {loading
-              ? "Aguarde..."
-              : mode === "login"
-                ? "Entrar"
-                : "Criar conta"}
+            {loading ? "Aguarde..." : "Entrar"}
           </button>
         </form>
 
-        <button
-          onClick={() => {
-            setMode(mode === "login" ? "signup" : "login");
-            setMsg(null);
-          }}
-          className="mt-4 w-full text-sm text-muted-foreground hover:text-primary"
-        >
-          {mode === "login"
-            ? "Não tem conta? Cadastre-se"
-            : "Já tem conta? Entrar"}
-        </button>
+        <p className="mt-6 text-xs text-center text-muted-foreground">
+          Novos usuários só podem ser criados por um administrador dentro do painel.
+        </p>
       </div>
     </div>
   );

@@ -98,6 +98,9 @@ function Header() {
           <a href="#properties" className="hover:text-primary transition-colors">
             Propriedades
           </a>
+          <Link to="/admin" className="hover:text-primary transition-colors">
+            Admin
+          </Link>
           <a href="#contato" className="hover:text-primary transition-colors">
             Contato
           </a>
