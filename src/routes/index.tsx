@@ -91,14 +91,21 @@ function Header() {
             Terra <span className="text-accent">&</span> Campo
           </span>
         </a>
-        <nav className="hidden gap-8 text-sm font-medium text-foreground md:flex">
+        <nav className="hidden items-center gap-6 text-sm font-medium text-foreground md:flex">
           <a href="#" className="hover:text-primary transition-colors">
             Início
           </a>
           <a href="#properties" className="hover:text-primary transition-colors">
             Propriedades
           </a>
-          <Link to="/admin" className="hover:text-primary transition-colors">
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary hover:bg-primary hover:text-primary-foreground transition"
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
             Admin
           </Link>
           <a href="#contato" className="hover:text-primary transition-colors">
