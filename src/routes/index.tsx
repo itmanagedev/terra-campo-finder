@@ -329,9 +329,6 @@ function Footer() {
         <p className="text-sm opacity-80">
           © 2024 Terra & Campo Imóveis Rurais. Todos os direitos reservados.
         </p>
-        <Link to="/admin" className="text-xs opacity-60 hover:opacity-100">
-          Admin
-        </Link>
       </div>
     </footer>
   );
