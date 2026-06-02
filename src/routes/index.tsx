@@ -102,17 +102,17 @@ function Header() {
             Contato
           </a>
         </nav>
-        <div className="hidden md:flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <a
             href="#properties"
-            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
+            className="hidden sm:inline-flex rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
           >
             Ver propriedades
           </a>
           <Link
             to="/admin"
             aria-label="Acessar painel administrativo"
-            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-primary hover:bg-primary hover:text-primary-foreground transition"
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-background px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary hover:bg-primary hover:text-primary-foreground transition"
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" />
