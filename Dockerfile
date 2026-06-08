@@ -12,6 +12,26 @@ COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
 COPY . .
+
+# Build args - precisam ser passados no EasyPanel (Build > Build Args)
+# As variáveis VITE_* SÃO embutidas no bundle no momento do build,
+# por isso precisam estar disponíveis aqui (não basta defini-las em runtime).
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_SUPABASE_PROJECT_ID
+ARG SUPABASE_URL
+ARG SUPABASE_PUBLISHABLE_KEY
+
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
+ENV SUPABASE_URL=$SUPABASE_URL
+ENV SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY
+
+# Falha cedo com mensagem clara se faltar variável crítica de build
+RUN test -n "$VITE_SUPABASE_URL" || (echo "ERRO: VITE_SUPABASE_URL não definida nos Build Args do EasyPanel" && exit 1)
+RUN test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || (echo "ERRO: VITE_SUPABASE_PUBLISHABLE_KEY não definida nos Build Args do EasyPanel" && exit 1)
+
 # Build com config Node.js (sem Cloudflare) para rodar no EasyPanel
 RUN npx vite build --config vite.config.node.ts
 
