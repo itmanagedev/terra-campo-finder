@@ -171,74 +171,219 @@ function Hero() {
   );
 }
 
+function Lightbox({
+  images,
+  title,
+  startIndex,
+  onClose,
+}: {
+  images: string[];
+  title: string;
+  startIndex: number;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(startIndex);
+  const total = images.length;
+  const prev = useCallback(
+    () => setIdx((i) => (i - 1 + total) % total),
+    [total],
+  );
+  const next = useCallback(() => setIdx((i) => (i + 1) % total), [total]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose, prev, next]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex flex-col bg-black/95"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Fotos da propriedade ${title}`}
+    >
+      <div className="flex items-center justify-between px-4 py-3 text-white">
+        <div className="text-sm font-medium">
+          {idx + 1} / {total} — {title}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Fechar"
+          className="rounded-full bg-white/10 p-2 hover:bg-white/20 transition"
+        >
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="relative flex flex-1 items-center justify-center px-2 sm:px-12">
+        <img
+          src={images[idx]}
+          alt={`${title} — foto ${idx + 1}`}
+          className="max-h-full max-w-full object-contain"
+        />
+        {total > 1 && (
+          <>
+            <button
+              onClick={prev}
+              aria-label="Foto anterior"
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition"
+            >
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18 9 12l6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={next}
+              aria-label="Próxima foto"
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition"
+            >
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 6 6 6-6 6" />
+              </svg>
+            </button>
+          </>
+        )}
+      </div>
+
+      {total > 1 && (
+        <div className="overflow-x-auto px-3 py-3">
+          <div className="flex gap-2">
+            {images.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-md ring-2 transition ${
+                  i === idx ? "ring-accent" : "ring-transparent opacity-70 hover:opacity-100"
+                }`}
+              >
+                <img src={src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PropertyCard({ p }: { p: Property }) {
+  const gallery = useMemo(() => {
+    const list = (p.images && p.images.length > 0 ? p.images : [p.image]).filter(
+      Boolean,
+    );
+    return list;
+  }, [p.images, p.image]);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
   const waLink = `https://wa.me/558588429467?text=${encodeURIComponent(
     `Olá, tenho interesse na propriedade ${p.title}`,
   )}`;
+
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-black/5 transition hover:shadow-xl hover:-translate-y-1">
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img
-          src={p.image}
-          alt={`${p.type} ${p.title} em ${p.city}/${p.state}`}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow">
-          {p.type}
-        </span>
-        <span className="absolute right-3 top-3 rounded-full bg-background/95 px-3 py-1 text-xs font-semibold text-foreground shadow">
-          {p.area} ha
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="text-lg font-semibold text-foreground">{p.title}</h3>
-        <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-          <svg
-            className="h-4 w-4 text-accent"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+    <>
+      <article className="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-black/5 transition hover:shadow-xl hover:-translate-y-1">
+        <button
+          type="button"
+          onClick={() => gallery.length > 0 && setLightboxIdx(0)}
+          aria-label={`Ver ${gallery.length} foto${gallery.length > 1 ? "s" : ""} de ${p.title}`}
+          className="relative aspect-[4/3] w-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent"
+        >
+          <img
+            src={gallery[0] ?? p.image}
+            alt={`${p.type} ${p.title} em ${p.city}/${p.state}`}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow">
+            {p.type}
+          </span>
+          <span className="absolute right-3 top-3 rounded-full bg-background/95 px-3 py-1 text-xs font-semibold text-foreground shadow">
+            {p.area} ha
+          </span>
+          {gallery.length > 1 && (
+            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+              {gallery.length} fotos
+            </span>
+          )}
+          <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/20 group-hover:opacity-100">
+            <span className="rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-foreground shadow">
+              Ver fotos
+            </span>
+          </span>
+        </button>
+        <div className="flex flex-1 flex-col p-5">
+          <h3 className="text-lg font-semibold text-foreground">{p.title}</h3>
+          <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+            <svg
+              className="h-4 w-4 text-accent"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            {p.city}, {p.state}
+          </p>
+          <p
+            className="mt-3 text-sm text-muted-foreground overflow-hidden"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
           >
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          {p.city}, {p.state}
-        </p>
-        <p
-          className="mt-3 text-sm text-muted-foreground overflow-hidden"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {p.description}
-        </p>
-        <div className="mt-4 flex items-end justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Valor
-            </p>
-            <p className="text-xl font-bold text-primary">
-              {formatPrice(p.price)}
-            </p>
+            {p.description}
+          </p>
+          <div className="mt-4 flex items-end justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Valor
+              </p>
+              <p className="text-xl font-bold text-primary">
+                {formatPrice(p.price)}
+              </p>
+            </div>
           </div>
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow hover:brightness-95 transition"
+          >
+            <WhatsAppIcon className="h-5 w-5" />
+            Tenho interesse
+          </a>
         </div>
-        <a
-          href={waLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow hover:brightness-95 transition"
-        >
-          <WhatsAppIcon className="h-5 w-5" />
-          Tenho interesse
-        </a>
-      </div>
-    </article>
+      </article>
+      {lightboxIdx !== null && gallery.length > 0 && (
+        <Lightbox
+          images={gallery}
+          title={p.title}
+          startIndex={lightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+        />
+      )}
+    </>
   );
 }
 
