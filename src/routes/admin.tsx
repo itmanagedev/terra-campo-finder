@@ -19,6 +19,7 @@ type Property = {
   price: number;
   description: string;
   image: string;
+  images: string[];
   created_at: string;
 };
 
@@ -31,6 +32,7 @@ const emptyForm = {
   price: "",
   description: "",
   image: "",
+  images: "",
 };
 
 function AdminPage() {
@@ -102,6 +104,7 @@ function AdminPage() {
       price: String(p.price),
       description: p.description,
       image: p.image,
+      images: (p.images ?? []).join("\n"),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -110,6 +113,11 @@ function AdminPage() {
     e.preventDefault();
     setSaving(true);
     setMsg(null);
+    const imagesArr = form.images
+      .split(/\r?\n|,/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const cover = form.image.trim() || imagesArr[0] || "";
     const payload = {
       title: form.title.trim(),
       type: form.type,
@@ -118,7 +126,8 @@ function AdminPage() {
       area: Number(form.area),
       price: Number(form.price),
       description: form.description.trim(),
-      image: form.image.trim(),
+      image: cover,
+      images: imagesArr.length ? imagesArr : (cover ? [cover] : []),
     };
     const { error } = editingId
       ? await supabase.from("properties").update(payload).eq("id", editingId)
@@ -257,7 +266,22 @@ function AdminPage() {
             <Field label="Estado (UF)" value={form.state} onChange={(v) => setForm({ ...form, state: v })} required maxLength={2} />
             <Field label="Área (hectares)" type="number" value={form.area} onChange={(v) => setForm({ ...form, area: v })} required />
             <Field label="Preço (R$)" type="number" value={form.price} onChange={(v) => setForm({ ...form, price: v })} required />
-            <Field label="URL da imagem" value={form.image} onChange={(v) => setForm({ ...form, image: v })} className="md:col-span-2" />
+            <Field label="URL da imagem de capa" value={form.image} onChange={(v) => setForm({ ...form, image: v })} className="md:col-span-2" />
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-foreground">
+                Galeria de imagens (uma URL por linha)
+              </label>
+              <textarea
+                value={form.images}
+                onChange={(e) => setForm({ ...form, images: e.target.value })}
+                rows={4}
+                placeholder={"https://exemplo.com/foto1.jpg\nhttps://exemplo.com/foto2.jpg"}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Cole uma URL por linha. Se vazio, usa apenas a imagem de capa.
+              </p>
+            </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-foreground">Descrição</label>
               <textarea

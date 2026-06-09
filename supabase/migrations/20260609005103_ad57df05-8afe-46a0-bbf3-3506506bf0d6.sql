@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS images text[] NOT NULL DEFAULT '{}'; UPDATE public.properties SET images = ARRAY[image] WHERE (images IS NULL OR array_length(images,1) IS NULL) AND image <> '';
