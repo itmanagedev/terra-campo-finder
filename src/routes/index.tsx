@@ -41,6 +41,7 @@ type Property = {
   price: number;
   description: string;
   image: string;
+  images: string[];
   created_at: string;
 };
 
