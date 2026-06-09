@@ -104,6 +104,7 @@ function AdminPage() {
       price: String(p.price),
       description: p.description,
       image: p.image,
+      images: (p.images ?? []).join("\n"),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
