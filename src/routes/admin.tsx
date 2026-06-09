@@ -266,7 +266,22 @@ function AdminPage() {
             <Field label="Estado (UF)" value={form.state} onChange={(v) => setForm({ ...form, state: v })} required maxLength={2} />
             <Field label="Área (hectares)" type="number" value={form.area} onChange={(v) => setForm({ ...form, area: v })} required />
             <Field label="Preço (R$)" type="number" value={form.price} onChange={(v) => setForm({ ...form, price: v })} required />
-            <Field label="URL da imagem" value={form.image} onChange={(v) => setForm({ ...form, image: v })} className="md:col-span-2" />
+            <Field label="URL da imagem de capa" value={form.image} onChange={(v) => setForm({ ...form, image: v })} className="md:col-span-2" />
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-foreground">
+                Galeria de imagens (uma URL por linha)
+              </label>
+              <textarea
+                value={form.images}
+                onChange={(e) => setForm({ ...form, images: e.target.value })}
+                rows={4}
+                placeholder={"https://exemplo.com/foto1.jpg\nhttps://exemplo.com/foto2.jpg"}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Cole uma URL por linha. Se vazio, usa apenas a imagem de capa.
+              </p>
+            </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-foreground">Descrição</label>
               <textarea
