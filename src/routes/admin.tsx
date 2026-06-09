@@ -113,6 +113,11 @@ function AdminPage() {
     e.preventDefault();
     setSaving(true);
     setMsg(null);
+    const imagesArr = form.images
+      .split(/\r?\n|,/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const cover = form.image.trim() || imagesArr[0] || "";
     const payload = {
       title: form.title.trim(),
       type: form.type,
@@ -121,7 +126,8 @@ function AdminPage() {
       area: Number(form.area),
       price: Number(form.price),
       description: form.description.trim(),
-      image: form.image.trim(),
+      image: cover,
+      images: imagesArr.length ? imagesArr : (cover ? [cover] : []),
     };
     const { error } = editingId
       ? await supabase.from("properties").update(payload).eq("id", editingId)
