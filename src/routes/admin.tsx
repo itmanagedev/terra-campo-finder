@@ -19,6 +19,7 @@ type Property = {
   price: number;
   description: string;
   image: string;
+  images: string[];
   created_at: string;
 };
 
@@ -31,6 +32,7 @@ const emptyForm = {
   price: "",
   description: "",
   image: "",
+  images: "",
 };
 
 function AdminPage() {
